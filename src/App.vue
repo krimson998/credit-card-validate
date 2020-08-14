@@ -9,23 +9,29 @@
         <form>
           <label for="card-number" class="card-number-title">Номер карты</label>
           <input
-            type="number"
+            type="text"
             name="card-number"
             class="card-number-input"
             placeholder="Номер карты"
+            v-mask="'#### #### #### ####'"
+            v-model="cardNumberInput"
           />
           <div class="small-inputs-container">
             <input
-              type="number"
+              type="text"
               name="card-date"
               class="card-date-input"
               placeholder="Срок действия"
+              v-mask="mask"
+              v-model="cardDateInput"
             />
             <input
-              type="number"
+              type="password"
               name="card-cvc"
               class="card-cvc-input"
               placeholder="CVC код"
+              v-mask="'###'"
+              v-model="cardCvcInput"
             />
           </div>
           <p class="payment-description">
@@ -42,9 +48,23 @@
 </template>
 
 <script>
+export function cardExpirationMask(value) {
+  const month = [/[0-1]/, value.charAt(0) === '1' ? /[0-2]/ : /[0-9]/];
+  const year = [/[0-9]/, /[0-9]/];
+  return [...month, '/', ...year];
+}
+
 export default {
   name: 'App',
   components: {},
+  data() {
+    return {
+      mask: cardExpirationMask,
+      cardNumberInput: '',
+      cardDateInput: '',
+      cardCvcInput: '',
+    };
+  },
 };
 </script>
 
@@ -157,7 +177,11 @@ body {
   padding-left: $form-padding;
   padding-right: $form-padding;
   margin-top: $form-indent;
+
+  &:focus {
+  }
 }
+
 .small-inputs-container {
   display: flex;
   width: 100%;
