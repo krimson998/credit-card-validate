@@ -15,11 +15,19 @@
             placeholder="Номер карты"
             v-mask="'#### #### #### ####'"
             v-model="cardNumberInput"
+            required
           />
-          <div v-if="!valid_credit_card(cardNumberInput)">
-            Not Valid
+          <div class="card-type-img-container">
+            <img class="card-type-img" :src="imgURL" alt="" />
           </div>
-          <div v-if="valid_credit_card(cardNumberInput)">Valid</div>
+
+          <div
+            v-if="!valid_credit_card(cardNumberInput)"
+            class="validation-error"
+          >
+            * Ошибка валидации или поле пустое
+          </div>
+
           <div class="small-inputs-container">
             <input
               type="text"
@@ -28,6 +36,7 @@
               placeholder="Срок действия"
               v-mask="mask"
               v-model="cardDateInput"
+              required
             />
             <input
               type="password"
@@ -36,6 +45,7 @@
               placeholder="CVC код"
               v-mask="'###'"
               v-model="cardCvcInput"
+              required
             />
           </div>
           <p class="payment-description">
@@ -57,6 +67,7 @@ export function cardExpirationMask(value) {
   const year = [/[0-9]/, /[0-9]/];
   return [...month, '/', ...year];
 }
+import creditCardType from 'credit-card-type';
 
 export default {
   name: 'App',
@@ -70,9 +81,20 @@ export default {
     };
   },
   methods: {
+    creditCardType(value) {
+      let cardType = creditCardType(value);
+      if (cardType[0] === undefined) {
+        return;
+      }
+      if (cardType[0] === '') {
+        return;
+      }
+      return cardType[0].type;
+    },
     valid_credit_card(value) {
       // Accept only digits, dashes or spaces
       if (/[^0-9-\s]+/.test(value)) return false;
+      if (!value) return false;
 
       // The Luhn Algorithm. It's so pretty.
       let nCheck = 0,
@@ -92,7 +114,15 @@ export default {
       return nCheck % 10 == 0;
     },
   },
-  computed: {},
+  computed: {
+    imgURL() {
+      if (!this.creditCardType(this.cardNumberInput)) {
+        return require(`@/assets/credit-card-brands/credit-cards.svg`);
+      }
+      let typeName = this.creditCardType(this.cardNumberInput);
+      return require(`@/assets/credit-card-brands/${typeName}.svg`);
+    },
+  },
 };
 </script>
 
@@ -131,6 +161,7 @@ body {
   margin: 0;
   font-family: $core-sans-regular;
 }
+
 .header {
   width: 100%;
   height: 100px;
@@ -185,6 +216,18 @@ body {
   padding-left: $form-padding;
   padding-right: $form-padding;
   margin-top: $form-indent;
+  position: relative;
+}
+.card-type-img-container {
+  position: relative;
+}
+
+.card-type-img {
+  position: absolute;
+  bottom: 15px;
+  left: 340px;
+  width: 42px;
+  height: 28px;
 }
 .card-date-input {
   width: 41%;
@@ -232,5 +275,17 @@ body {
   margin: auto;
   font-size: $paragraph-size;
   color: #ffffff;
+}
+.validation-error {
+  color: #ff8d8d;
+  font-size: 12px;
+  line-height: 167%;
+  margin-top: 10px;
+}
+.validation-accept {
+  color: lightgreen;
+  font-size: 12px;
+  line-height: 167%;
+  margin-top: 10px;
 }
 </style>
