@@ -27,9 +27,10 @@
               v-model="cardNumberInput"
             />
             <div class="card-type-img-container">
+              <!-- Динамическая вставка изображения брэнда карты -->
               <img class="card-type-img" :src="imgURL" :alt="imgAlt" />
             </div>
-
+            <!-- Сообщение об ошибке (после нажатия кнопки) -->
             <div
               v-if="!validCreditCard(cardNumberInput) && hidden"
               class="number-error"
@@ -50,6 +51,7 @@
                   v-mask="mask"
                   v-model="cardDateInput"
                 />
+                <!-- Сообщение об ошибке (после нажатия кнопки) -->
                 <div
                   v-if="!isFutureDate(cardDateInput) && hidden"
                   class="validation-error"
@@ -69,6 +71,7 @@
                   v-mask="'###'"
                   v-model="cardCvcInput"
                 />
+                <!-- Сообщение об ошибке (после нажатия кнопки) -->
                 <div
                   v-if="isEmptyCVC(cardCvcInput) && hidden"
                   class="validation-error"
@@ -99,6 +102,7 @@
 
 <script>
 export function cardExpirationMask(value) {
+  /* Маска для поля ввода даты карты */
   const month = [
     /[0-1]/,
     value.charAt(0) === '1'
@@ -130,6 +134,7 @@ export default {
   },
   methods: {
     creditCardType(value) {
+      /* Проверка брэнда карты */
       let cardType = creditCardType(value);
       if (cardType[0] === undefined) {
         return;
@@ -143,6 +148,7 @@ export default {
       return cardType[0].type;
     },
     validCreditCard(value) {
+      /* Проверка карты на валидацию по алгоритму Луна */
       if (/[^0-9-\s]+/.test(value)) return false;
       if (!value) return false;
 
@@ -163,6 +169,7 @@ export default {
       return nCheck % 10 == 0;
     },
     isFutureDate(idate) {
+      /* Проверка даты на действительность */
       let today = new Date().getTime();
       idate = idate.split('/');
 
@@ -171,6 +178,7 @@ export default {
     },
 
     isEmptyNumber(value) {
+      /* Проверка на полное введение номера карты*/
       if (this.validCreditCard(this.cardNumberInput) === true) {
         return false;
       } else if (value.length < 18) {
@@ -180,6 +188,7 @@ export default {
       }
     },
     isEmptyDate(value) {
+      /* Проверка на полное введение даты карты */
       if (value.length < 5) {
         return true;
       } else {
@@ -187,6 +196,7 @@ export default {
       }
     },
     isEmptyCVC(value) {
+      /* Проверка на полное введение CVC карты */
       if (value.length < 3) {
         return true;
       } else {
@@ -195,6 +205,7 @@ export default {
     },
 
     cardValidation() {
+      /* Проверка карты на валидность */
       this.clicked = true;
       this.toggleSpinner = true;
       if (
@@ -221,6 +232,7 @@ export default {
   },
   computed: {
     imgURL() {
+      /* Генерация пути для изображения брэнда карты */
       if (!this.creditCardType(this.cardNumberInput)) {
         return require(`@/assets/credit-card-brands/credit-cards.svg`);
       }
@@ -228,9 +240,11 @@ export default {
       return require(`@/assets/credit-card-brands/${typeName}.svg`);
     },
     imgAlt() {
+      /* Генерация alt-a брэнда карты */
       return this.creditCardType(this.cardNumberInput);
     },
     errorInputNumberBorder() {
+      /* Отображение красного бордера, если номер введен не полностью (после нажатия на кнопку) */
       if (
         this.hidden === true &&
         this.isEmptyNumber(this.cardNumberInput) === true
@@ -241,6 +255,7 @@ export default {
       }
     },
     errorInputDateBorder() {
+      /* Отображение красного бордера, если дата введена не полностью (после нажатия на кнопку) */
       if (
         this.hidden === true &&
         this.isEmptyDate(this.cardDateInput) === true
@@ -251,6 +266,7 @@ export default {
       }
     },
     errorInputCVCBorder() {
+      /* Отображение красного бордера, если cvc введен не полностью (после нажатия на кнопку) */
       if (this.hidden === true && this.isEmptyCVC(this.cardCvcInput) === true) {
         return true;
       } else {
@@ -269,6 +285,7 @@ $gradient: linear-gradient(90deg, #5a4be6 0.26%, #73aff7 47.1%, #93d0d9 99.8%);
 $form-indent: 17px;
 $form-padding: 16px;
 $paragraph-size: 16px;
+$full: 100%;
 $button-gradient: linear-gradient(
   122.5deg,
   #5a4be6 -33.07%,
@@ -306,7 +323,7 @@ body {
 }
 
 .header {
-  width: 100%;
+  width: $full;
   height: 100px;
   display: flex;
   justify-content: center;
@@ -344,13 +361,13 @@ body {
   font-weight: 200;
 }
 .main-container {
-  width: 100%;
+  width: $full;
   display: flex;
   justify-content: center;
 }
 .card-container {
   width: 66.666666%;
-  height: 100%;
+  height: $full;
   border: 1px solid #e4e4e4;
   border-radius: 4px;
   margin-top: 20px;
@@ -366,16 +383,16 @@ body {
   padding-left: $form-padding;
   box-sizing: border-box;
   width: 400px;
-  height: 100%;
+  height: $full;
 }
 .card-number-title {
   font-size: 18px;
   font-weight: bold;
-  width: 100%;
+  width: $full;
   display: inline-block;
 }
 .card-number-input {
-  width: 100%;
+  width: $full;
   border-radius: 4px;
   border: 1px solid #cccccc;
   height: 55px;
@@ -401,7 +418,7 @@ body {
   width: 48%;
 }
 .card-date-cvc-input {
-  width: 100%;
+  width: $full;
   border-radius: 4px;
   border: 1px solid #cccccc;
   height: 55px;
@@ -417,7 +434,7 @@ body {
 
 .small-inputs-container {
   display: flex;
-  width: 100%;
+  width: $full;
   justify-content: space-between;
   height: auto;
 }
@@ -434,7 +451,7 @@ body {
   align-items: center;
   justify-content: center;
   height: 56px;
-  width: 100%;
+  width: $full;
   border-radius: 0;
   user-select: none;
   cursor: pointer;
@@ -451,14 +468,14 @@ body {
   font-size: 12px;
   line-height: 167%;
   margin-top: 10px;
-  width: 100%;
+  width: $full;
 }
 .validation-error {
   color: #ff8d8d;
   font-size: 12px;
   line-height: 167%;
   margin-top: 10px;
-  width: 100%;
+  width: $full;
 }
 
 .loader {
@@ -547,8 +564,8 @@ body {
 @media (max-width: $breakpoint-small) {
   .card-container {
     width: 90%;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: $form-padding;
+    padding-bottom: $form-padding;
   }
   .header {
     display: flex;
