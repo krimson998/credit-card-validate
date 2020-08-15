@@ -576,6 +576,9 @@ body {
   .card-number-title {
     display: none;
   }
+  .card-number-input {
+    margin-top: 0;
+  }
   .get-money-button {
     margin-top: 32px;
   }
