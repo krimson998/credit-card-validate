@@ -36,37 +36,39 @@
             </div>
 
             <div class="small-inputs-container">
-              <input
-                type="text"
-                name="card-date"
-                class="card-date-input"
-                placeholder="Срок действия"
-                v-mask="mask"
-                v-model="cardDateInput"
-                required
-              />
-              <input
-                type="password"
-                name="card-cvc"
-                class="card-cvc-input"
-                placeholder="CVC код"
-                v-mask="'###'"
-                v-model="cardCvcInput"
-                required
-              />
-            </div>
-            <div class="error-container">
-              <div
-                v-if="!isFutureDate(cardDateInput) && hidden"
-                class="validation-error"
-              >
-                * Поле пустое, или истек срок действия карты
+              <div class="input-handler">
+                <input
+                  type="text"
+                  name="card-date"
+                  class="card-date-input"
+                  placeholder="Срок действия"
+                  v-mask="mask"
+                  v-model="cardDateInput"
+                  required
+                />
+                <div
+                  v-if="!isFutureDate(cardDateInput) && hidden"
+                  class="validation-error"
+                >
+                  * Поле пустое, или истек срок действия карты
+                </div>
               </div>
-              <div
-                v-if="emptyCVV(cardCvcInput) && hidden"
-                class="validation-error"
-              >
-                * Поле пустое или заполнено не до конца
+              <div class="input-handler">
+                <input
+                  type="password"
+                  name="card-cvc"
+                  class="card-cvc-input"
+                  placeholder="CVC код"
+                  v-mask="'###'"
+                  v-model="cardCvcInput"
+                  required
+                />
+                <div
+                  v-if="emptyCVV(cardCvcInput) && hidden"
+                  class="validation-error"
+                >
+                  * Поле пустое или заполнено не до конца
+                </div>
               </div>
             </div>
             <p class="payment-description">
@@ -342,8 +344,11 @@ body {
   width: 42px;
   height: 28px;
 }
-.card-date-input {
+.input-handler {
   width: 48%;
+}
+.card-date-input {
+  width: 100%;
   border-radius: 4px;
   border: 1px solid #cccccc;
   height: 55px;
@@ -354,7 +359,7 @@ body {
   box-sizing: border-box;
 }
 .card-cvc-input {
-  width: 48%;
+  width: 100%;
   border-radius: 4px;
   border: 1px solid #cccccc;
   height: 55px;
@@ -372,6 +377,7 @@ body {
   display: flex;
   width: 100%;
   justify-content: space-between;
+  height: 125px;
 }
 .payment-description {
   color: #808080;
@@ -408,14 +414,9 @@ body {
   font-size: 12px;
   line-height: 167%;
   margin-top: 10px;
-  width: 50%;
+  width: 100%;
 }
 
-.error-container {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-}
 .loader {
   border: 4px solid #f3f3f3; /* Light grey */
   border-top: 4px solid #3498db; /* Blue */
