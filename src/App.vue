@@ -29,7 +29,7 @@
             </div>
 
             <div
-              v-if="!valid_credit_card(cardNumberInput) && hidden"
+              v-if="!validCreditCard(cardNumberInput) && hidden"
               class="number-error"
             >
               * Ошибка валидации или поле пустое
@@ -40,11 +40,11 @@
                 <input
                   type="text"
                   name="card-date"
+                  required
                   class="card-date-input"
                   placeholder="Срок действия"
                   v-mask="mask"
                   v-model="cardDateInput"
-                  required
                 />
                 <div
                   v-if="!isFutureDate(cardDateInput) && hidden"
@@ -57,11 +57,11 @@
                 <input
                   type="password"
                   name="card-cvc"
+                  required
                   class="card-cvc-input"
                   placeholder="CVC код"
                   v-mask="'###'"
                   v-model="cardCvcInput"
-                  required
                 />
                 <div
                   v-if="emptyCVV(cardCvcInput) && hidden"
@@ -73,9 +73,9 @@
             </div>
             <p class="payment-description">
               Для привязки карты мы проведем платеж в размере 1.00 UAH, который
-              будет возвращен в течении 30 минут.
+              будет возвращен в течение 30 минут.
             </p>
-            <div
+            <button
               :disabled="clicked"
               type="button"
               class="get-money-button"
@@ -83,7 +83,7 @@
             >
               <span class="loader" v-show="toggleSpinner"></span
               ><span class="get-money-title">Получить деньги</span>
-            </div>
+            </button>
           </form>
         </div>
       </div>
@@ -136,12 +136,10 @@ export default {
       }
       return cardType[0].type;
     },
-    valid_credit_card(value) {
-      // Accept only digits, dashes or spaces
+    validCreditCard(value) {
       if (/[^0-9-\s]+/.test(value)) return false;
       if (!value) return false;
 
-      // The Luhn Algorithm. It's so pretty.
       let nCheck = 0,
         bEven = false;
       value = value.replace(/\D/g, '');
@@ -175,13 +173,15 @@ export default {
     cardValidation() {
       this.clicked = true;
       this.toggleSpinner = true;
+
       if (
-        this.valid_credit_card(this.cardNumberInput) === true &&
+        this.validCreditCard(this.cardNumberInput) === true &&
         this.isFutureDate(this.cardDateInput) === true &&
         this.emptyCVV(this.cardCvcInput) === false
       ) {
         setTimeout(() => {
           this.clicked = false;
+
           this.toggleSpinner = false;
           return alert('verified');
         }, 3000);
@@ -270,8 +270,8 @@ body {
   bottom: 40px;
 }
 .horizontal-line {
-  margin-right: 2px;
-  margin-left: 2px;
+  margin-right: 4px;
+  margin-left: 4px;
 }
 .ru-language {
   font-family: $core-sans-thin;
@@ -293,13 +293,12 @@ body {
 }
 .main-container {
   width: 100%;
-  min-height: 100vh;
   display: flex;
   justify-content: center;
 }
 .card-container {
   width: 66.666666%;
-  height: 530px;
+  height: 100%;
   border: 1px solid #e4e4e4;
   border-radius: 4px;
   margin-top: 20px;
@@ -307,13 +306,15 @@ body {
   justify-content: center;
   align-items: center;
   margin-bottom: 130px;
+  padding-bottom: 50px;
+  padding-top: 50px;
 }
 .form-container {
   padding-right: $form-padding;
   padding-left: $form-padding;
   box-sizing: border-box;
   width: 400px;
-  height: 330px;
+  height: 100%;
 }
 .card-number-title {
   font-size: 18px;
@@ -377,7 +378,7 @@ body {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  height: 125px;
+  height: auto;
 }
 .payment-description {
   color: #808080;
@@ -396,6 +397,8 @@ body {
   border-radius: 0;
   user-select: none;
   cursor: pointer;
+  border-radius: 4px;
+  border: 0 solid black;
 }
 .get-money-title {
   font-size: $paragraph-size;
@@ -459,7 +462,53 @@ body {
     right: 95px;
   }
 }
-@media (max-width: $breakpoint-tablet) {
+@media (max-width: 435px) {
+  .card-type-img {
+    left: 305px;
+  }
+}
+@media (max-width: 425px) {
+  .card-type-img {
+    left: 295px;
+  }
+}
+@media (max-width: 415px) {
+  .card-type-img {
+    left: 285px;
+  }
+}
+@media (max-width: 405px) {
+  .card-type-img {
+    left: 275px;
+  }
+}
+@media (max-width: 395px) {
+  .card-type-img {
+    left: 265px;
+  }
+}
+@media (max-width: 385px) {
+  .card-type-img {
+    left: 255px;
+  }
+}
+@media (max-width: 375px) {
+  .card-type-img {
+    left: 245px;
+  }
+}
+@media (max-width: 365px) {
+  .card-type-img {
+    left: 235px;
+  }
+}
+
+@media (max-width: $breakpoint-small) {
+  .card-container {
+    width: 90%;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
   .header {
     display: flex;
     align-items: center;
@@ -486,10 +535,8 @@ body {
   .card-number-title {
     display: none;
   }
-}
-@media (max-width: $breakpoint-small) {
-  .card-container {
-    width: 90%;
+  .get-money-button {
+    margin-top: 32px;
   }
 }
 </style>
