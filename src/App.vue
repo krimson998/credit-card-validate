@@ -18,11 +18,13 @@
             <input
               type="text"
               name="card-number"
-              class="card-number-input"
+              :class="{
+                'card-number-input': true,
+                errorBorder: errorInputNumberBorder,
+              }"
               placeholder="Номер карты"
               v-mask="'#### #### #### ####'"
               v-model="cardNumberInput"
-              required
             />
             <div class="card-type-img-container">
               <img class="card-type-img" :src="imgURL" :alt="imgAlt" />
@@ -32,7 +34,7 @@
               v-if="!validCreditCard(cardNumberInput) && hidden"
               class="number-error"
             >
-              * Ошибка валидации или поле пустое
+              * Ошибка валидации, поле пустое или заполнено не до конца
             </div>
 
             <div class="small-inputs-container">
@@ -40,8 +42,10 @@
                 <input
                   type="text"
                   name="card-date"
-                  required
-                  class="card-date-input"
+                  :class="{
+                    'card-date-cvc-input': true,
+                    errorBorder: errorInputDateBorder,
+                  }"
                   placeholder="Срок действия"
                   v-mask="mask"
                   v-model="cardDateInput"
@@ -56,15 +60,17 @@
               <div class="input-handler">
                 <input
                   type="password"
-                  name="card-cvc"
-                  required
-                  class="card-cvc-input"
+                  name="card-date-cvc-input"
+                  :class="{
+                    'card-date-cvc-input': true,
+                    errorBorder: errorInputCVCBorder,
+                  }"
                   placeholder="CVC код"
                   v-mask="'###'"
                   v-model="cardCvcInput"
                 />
                 <div
-                  v-if="emptyCVV(cardCvcInput) && hidden"
+                  v-if="isEmptyCVC(cardCvcInput) && hidden"
                   class="validation-error"
                 >
                   * Поле пустое или заполнено не до конца
@@ -163,25 +169,44 @@ export default {
       idate = new Date('20' + idate[1], idate[0] - 1, 0).getTime();
       return today - idate < 0;
     },
-    emptyCVV(value) {
+
+    isEmptyNumber(value) {
+      if (this.validCreditCard(this.cardNumberInput) === true) {
+        return false;
+      } else if (value.length < 18) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isEmptyDate(value) {
+      if (value.length < 5) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isEmptyCVC(value) {
       if (value.length < 3) {
         return true;
       } else {
         return false;
       }
     },
+
     cardValidation() {
       this.clicked = true;
       this.toggleSpinner = true;
-
       if (
         this.validCreditCard(this.cardNumberInput) === true &&
         this.isFutureDate(this.cardDateInput) === true &&
-        this.emptyCVV(this.cardCvcInput) === false
+        this.isEmptyCVC(this.cardCvcInput) === false &&
+        this.isEmptyNumber(this.cardNumberInput) === false &&
+        this.isEmptyDate(this.cardDateInput) === false &&
+        this.isEmptyCVC(this.cardCvcInput) === false
       ) {
         setTimeout(() => {
           this.clicked = false;
-
           this.toggleSpinner = false;
           return alert('verified');
         }, 3000);
@@ -204,6 +229,33 @@ export default {
     },
     imgAlt() {
       return this.creditCardType(this.cardNumberInput);
+    },
+    errorInputNumberBorder() {
+      if (
+        this.hidden === true &&
+        this.isEmptyNumber(this.cardNumberInput) === true
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    errorInputDateBorder() {
+      if (
+        this.hidden === true &&
+        this.isEmptyDate(this.cardDateInput) === true
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    errorInputCVCBorder() {
+      if (this.hidden === true && this.isEmptyCVC(this.cardCvcInput) === true) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
 };
@@ -348,7 +400,7 @@ body {
 .input-handler {
   width: 48%;
 }
-.card-date-input {
+.card-date-cvc-input {
   width: 100%;
   border-radius: 4px;
   border: 1px solid #cccccc;
@@ -359,19 +411,8 @@ body {
   margin-top: $form-indent;
   box-sizing: border-box;
 }
-.card-cvc-input {
-  width: 100%;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  height: 55px;
-  font-size: $paragraph-size;
-  padding-left: $form-padding;
-  padding-right: $form-padding;
-  margin-top: $form-indent;
-  box-sizing: border-box;
-
-  &:focus {
-  }
+.errorBorder {
+  border: 1px solid #ff8d8d;
 }
 
 .small-inputs-container {
@@ -410,7 +451,7 @@ body {
   font-size: 12px;
   line-height: 167%;
   margin-top: 10px;
-  width: 60%;
+  width: 100%;
 }
 .validation-error {
   color: #ff8d8d;
@@ -523,14 +564,14 @@ body {
   }
   .title {
     margin-top: 20px;
-    width: 50%;
+    width: 60%;
     margin-right: auto;
     margin-left: auto;
     height: auto;
     font-weight: 200;
     font-size: 25px;
     text-align: center;
-    margin-bottom: 33px;
+    margin-bottom: 17px;
   }
   .card-number-title {
     display: none;
