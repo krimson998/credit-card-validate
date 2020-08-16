@@ -112,8 +112,7 @@ export function cardExpirationMask(value) {
       : /[0-9]/,
   ];
   const year = [/[0-9]/, value.charAt(3) === '0' ? /[1-9]/ : /[0-9]/];
-
-  return [...month, '/', ...year];
+  return value.length > 2 ? [...month, '/', ...year] : month;
 }
 
 import creditCardType from 'credit-card-type';
